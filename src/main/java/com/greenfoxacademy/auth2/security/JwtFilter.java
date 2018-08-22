@@ -1,5 +1,6 @@
 package com.greenfoxacademy.auth2.security;
 
+import com.greenfoxacademy.auth2.models.JwtUser;
 import com.greenfoxacademy.auth2.models.User;
 import com.greenfoxacademy.auth2.service.JwtService;
 import io.jsonwebtoken.JwtException;
@@ -7,7 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
 import java.io.IOException;
-import java.util.logging.LogRecord;
 import javax.servlet.*;
 import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpServletRequest;
@@ -23,8 +23,7 @@ public class JwtFilter implements Filter
     @Value("${jwt.auth.header}")
     String authHeader;
 
-    @Override
-    public void init(FilterConfig filterConfig) throws ServletException {}
+    @Override public void init(FilterConfig filterConfig) throws ServletException  {}
     @Override public void destroy() {}
 
     @Override
@@ -42,8 +41,8 @@ public class JwtFilter implements Filter
 
         try
         {
-            User user = jwtTokenService.getUser(authHeaderVal);
-            httpRequest.setAttribute("jwtUser", user);
+            JwtUser jwtUser  = jwtTokenService.getUser(authHeaderVal);
+            httpRequest.setAttribute("jwtUser", jwtUser);
         }
         catch(JwtException e)
         {
@@ -52,7 +51,5 @@ public class JwtFilter implements Filter
         }
 
         chain.doFilter(httpRequest, httpResponse);
-
     }
-
 }

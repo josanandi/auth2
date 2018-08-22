@@ -1,6 +1,7 @@
 package com.greenfoxacademy.auth2.controllers;
 
 import com.greenfoxacademy.auth2.models.ErrorMessage;
+import com.greenfoxacademy.auth2.models.JwtUser;
 import com.greenfoxacademy.auth2.models.User;
 import com.greenfoxacademy.auth2.service.JwtService;
 import com.greenfoxacademy.auth2.service.UserService;
@@ -40,17 +41,18 @@ public class AuthController {
 
     @PostMapping(value = "/api/auth")
     public ResponseEntity<?> auth(@RequestBody User user) {
-        String userName = user.getEmail();
-        String passWord = user.getPassword();
-        Boolean correctCredentials = userService.authenticate(userName, passWord);
+        String email = user.getEmail();
+        String password = user.getPassword();
+        Boolean correctCredentials = userService.authenticate(email, password);
         if (correctCredentials) {
-            return ResponseEntity.ok(jwtService.getToken(user));
+            JwtUser jwtUser = new JwtUser(email, password);
+            return ResponseEntity.ok(jwtService.getToken(jwtUser));
         }
         return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
     }
 
 
-    @GetMapping(value = "/api/secure/profile/{id}")
+    @GetMapping(value = "/secure/profile/{id}")
     public ResponseEntity<?> helloSecure(@PathVariable Long id)
     {
         User user = userService.findUserById(id);

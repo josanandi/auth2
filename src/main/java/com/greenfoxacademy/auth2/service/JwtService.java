@@ -1,5 +1,7 @@
 package com.greenfoxacademy.auth2.service;
 
+
+import com.greenfoxacademy.auth2.models.JwtUser;
 import com.greenfoxacademy.auth2.models.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -48,38 +50,36 @@ public class JwtService
         return new Date(expireInMilis + now.getTime());
     }
 
-    protected User getUser(String encodedSecret, String token)
-    {
+    protected JwtUser getUser(String encodedSecret, String token) {
         Claims claims = Jwts.parser()
                 .setSigningKey(encodedSecret)
                 .parseClaimsJws(token)
                 .getBody();
         String userName = claims.getSubject();
-        String role = (String) claims.get("role");
-        User securityUser = new User();
+        JwtUser securityUser = new JwtUser();
         securityUser.setEmail(userName);
         return securityUser;
     }
 
-    public User getUser(String token)
+    public JwtUser getUser(String token)
     {
         return getUser(this.encodedSecret, token);
     }
 
-    protected String getToken(String encodedSecret, User user)
+    protected String getToken(String encodedSecret, JwtUser jwtUser)
     {
         Date now = new Date();
         return Jwts.builder()
                 .setId(UUID.randomUUID().toString())
-                .setSubject(user.getEmail())
+                .setSubject(jwtUser.getEmail())
                 .setIssuedAt(now)
                 .setExpiration(getExpirationTime())
                 .signWith(SignatureAlgorithm.HS512, encodedSecret)
                 .compact();
     }
 
-    public String getToken(User user)
+    public String getToken(JwtUser jwtUser)
     {
-        return getToken(this.encodedSecret, user);
+        return getToken(this.encodedSecret, jwtUser);
     }
 }
